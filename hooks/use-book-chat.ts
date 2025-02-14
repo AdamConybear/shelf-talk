@@ -12,6 +12,7 @@ export function useBookChat(bookId: string) {
   );
 
   const addMessage = async (content: string, role: 'user' | 'assistant' = 'user') => {
+    console.log('addMessage', content, role);
     const newMessage = {
       id: uuidv4(),
       role,
@@ -33,25 +34,24 @@ export function useBookChat(bookId: string) {
       });
     }
 
-    const bookChat = await db.chats.where('bookId').equals(bookId).first();
+    // const bookChat = await db.chats.where('bookId').equals(bookId).first();
 
-    // Mock AI response
-    if (bookChat && role === 'user') {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    // // Mock AI response
+    // if (bookChat && role === 'user') {
+    //   // Simulate network delay
+    //   await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const aiMessage = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: `This is a mock response to your message: "${content}"`,
-        timestamp: new Date()
-      };
+    //   const aiMessage = {
+    //     id: uuidv4(),
+    //     role: 'assistant',
+    //     content: `This is a mock response to your message: "${content}"`,
+    //     timestamp: new Date()
+    //   };
       
-      await db.chats.update(bookChat.id, {
-        messages: [...bookChat.messages, aiMessage]
-      } as Partial<Chat>);
-    }
-
+    //   await db.chats.update(bookChat.id, {
+    //     messages: [...bookChat.messages, aiMessage]
+    //   } as Partial<Chat>);
+    // }
   };
 
   return {

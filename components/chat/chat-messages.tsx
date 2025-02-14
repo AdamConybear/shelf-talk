@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils"
-import { Message } from "@/db"
+import { Message } from "ai"
 import { Bot } from "lucide-react"
 
 interface MessagesProps {

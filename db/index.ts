@@ -1,4 +1,5 @@
 import Dexie, { Table } from 'dexie';
+import { Message } from 'ai';
 
 // Define types for our database entities
 export interface Book {
@@ -14,13 +15,6 @@ export interface Chat {
   id: string;
   bookId: string;
   messages: Array<Message>;
-}
-
-export interface Message {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: Date;
 }
 
 // Define the database

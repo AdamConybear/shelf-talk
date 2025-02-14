@@ -94,11 +94,11 @@ export function Navbar() {
                 {currentBook.percentCompleted}% completed
               </Button>
           </DialogTrigger>
-          {/* <DialogTrigger asChild>
+          <DialogTrigger asChild>
             <Button variant="ghost" className="sm:hidden">
               {currentBook.percentCompleted}%
             </Button>
-          </DialogTrigger> */}
+          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reading Progress</DialogTitle>

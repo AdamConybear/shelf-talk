@@ -1,18 +1,29 @@
 "use client";
 
 import { SendHorizontal } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { ChatRequestOptions } from "ai";
+import { useBookChat } from "@/hooks/use-book-chat";
 
 interface InputProps {
-  onSubmit: (message: string) => void
+  bookId: string;
+  input: string;
+  isLoading: boolean;
+  setInput: (value: string) => void,
+  handleSubmit: (
+    event?: {
+      preventDefault?: () => void;
+    },
+    chatRequestOptions?: ChatRequestOptions,
+  ) => void;
 }
 
-export function ChatInput({ onSubmit }: InputProps) {
-  const [message, setMessage] = useState("")
+export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading }: InputProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { addMessage } = useBookChat(bookId);
 
   const adjustHeight = (element: HTMLTextAreaElement) => {
     element.style.height = '0'
@@ -25,26 +36,24 @@ export function ChatInput({ onSubmit }: InputProps) {
     if (textareaRef.current) {
       adjustHeight(textareaRef.current)
     }
-  }, [message]) // This will run on mount and whenever message changes
+  }, [input]) // This will run on mount and whenever message changes
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (message.trim()) {
-      onSubmit(message.trim())
-      setMessage("")
-      setIsExpanded(false)
+  const submitForm = useCallback(async () => {
+    if(input.trim()) {
+      handleSubmit(undefined);
+      setIsExpanded(false);
     }
-  }
+  }, [handleSubmit, input]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (!isLoading && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      submitForm()
     }
   }
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
+    setInput(e.target.value)
     adjustHeight(e.target)
   }
   return (
@@ -53,7 +62,7 @@ export function ChatInput({ onSubmit }: InputProps) {
         <div className="relative flex justify-center w-full max-w-2xl px-4">
           <Textarea 
             ref={textareaRef}
-            value={message}
+            value={input}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
             className={`pr-12 w-full resize-none min-h-[55px] max-h-[200px] py-4 overflow-hidden ${
@@ -66,7 +75,7 @@ export function ChatInput({ onSubmit }: InputProps) {
             variant="secondary"
             size="icon"
             className="absolute right-7 top-1/2 -translate-y-1/2 rounded-full"
-            disabled={!message.trim()}
+            disabled={!input.trim()}
           >
             <SendHorizontal />
           </Button>

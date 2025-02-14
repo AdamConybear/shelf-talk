@@ -24,7 +24,6 @@ export function FileUploader() {
       const bookExists = books?.some(book => 
         book.name === newFile.name
       )
-      console.log(bookExists)
 
       if (bookExists) {
         toast({
