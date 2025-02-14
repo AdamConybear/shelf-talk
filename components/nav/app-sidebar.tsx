@@ -1,7 +1,7 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
-import { SidebarHeader, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "../ui/sidebar";
+import { Plus } from "lucide-react";
+import { SidebarHeader, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar, SidebarFooter } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import { NavMain } from "./nav-main";

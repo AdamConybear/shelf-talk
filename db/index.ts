@@ -5,10 +5,12 @@ import { Message } from 'ai';
 export interface Book {
   id: string;
   name: string;
+  displayName: string;
   preview: string;
   epubData: ArrayBuffer;
   dateAdded: Date;
   percentCompleted: number;
+  text: string;
 }
 
 export interface Chat {

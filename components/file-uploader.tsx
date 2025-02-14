@@ -8,10 +8,17 @@ import { useRouter } from "next/navigation"
 import { cn, formatBytes } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useBooks } from '@/hooks/use-books'
+import Section from "epubjs/types/section";
+import Spine from "epubjs/types/spine";
+
+// Extending the type
+interface ExtendedSpine extends Spine {
+  spineItems: Array<Section>; // Replace 'any' with a more specific type if known
+}
 
 export function FileUploader() {
   const { toast } = useToast()
-  const { books, addBook } = useBooks()
+  const { books, addBook, updateBookText } = useBooks()
   const router = useRouter()
 
   const onDrop = React.useCallback(
@@ -55,9 +62,27 @@ export function FileUploader() {
         // Save to IndexedDB and get the new book ID
         const bookId = await addBook({
           name: newFile.name,
+          displayName: newFile.name,
           preview: base64Cover,
           epubData: arrayBuffer,
         })
+
+        // Get all book text
+        let bookText = '';
+        const spine = book.spine as ExtendedSpine;
+
+        await Promise.all(spine.spineItems.map(async (section: Section) => {
+          await section.load(book.load.bind(book));
+          if(section.idref === "cover" || section.idref === "titlepage"){
+            return;
+          }
+          // TODO: better parse epub so I only get the text I need
+          let text = section.document.body.innerText
+          text = text.replace(/[\n\t]/g, ''); // Remove all newline and tab characters
+          bookText += text;
+        }));
+
+        updateBookText(bookId, bookText);
 
         toast({
           title: "Success",

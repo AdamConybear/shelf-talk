@@ -13,7 +13,7 @@ import { useParams } from "next/navigation";
 
 export function Navbar() {
   const params = useParams();
-  const { books, updateName, updateProgress } = useBooks();
+  const { books, updateDisplayName, updateProgress } = useBooks();
   const [isEditing, setIsEditing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +28,7 @@ export function Navbar() {
 
   const handleNameSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && currentBook) {
-      updateName(currentBook.id, e.currentTarget.value );
+      updateDisplayName(currentBook.id, e.currentTarget.value );
       setIsEditing(false);
     }
     if (e.key === 'Escape') {
@@ -72,17 +72,17 @@ export function Navbar() {
             className="p-0 m-0 font-semibold truncate max-w-full" 
             onClick={() => setIsEditing(true)}
           >
-            {currentBook.name}
+            {currentBook.displayName}
           </Button>
         )}
         {currentBook && isEditing && (
           <Input
             className="w-auto min-w-[100px] max-w-[400px] h-7 text-sm text-center px-2"
-            defaultValue={currentBook.name}
+            defaultValue={currentBook.displayName}
             autoFocus
             onKeyDown={handleNameSubmit}
             onBlur={() => setIsEditing(false)}
-            style={{ width: `${Math.min(currentBook.name.length + 2, 40)}ch` }}
+            style={{ width: `${Math.min(currentBook.displayName.length + 2, 40)}ch` }}
           />
         )}
       </div>

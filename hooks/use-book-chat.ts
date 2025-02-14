@@ -3,6 +3,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Chat, db } from '@/db';
 import { v4 as uuidv4 } from 'uuid';
+import { getPercentageOfString } from '@/lib/utils';
 
 export function useBookChat(bookId: string) {
   
@@ -12,7 +13,6 @@ export function useBookChat(bookId: string) {
   );
 
   const addMessage = async (content: string, role: 'user' | 'assistant' = 'user') => {
-    console.log('addMessage', content, role);
     const newMessage = {
       id: uuidv4(),
       role,
@@ -33,29 +33,22 @@ export function useBookChat(bookId: string) {
         messages: [newMessage]
       });
     }
+  };
 
-    // const bookChat = await db.chats.where('bookId').equals(bookId).first();
+  const getBookName = async () => {
+    const book = await db.books.where('id').equals(bookId).first();
+    return book?.name;
+  };
 
-    // // Mock AI response
-    // if (bookChat && role === 'user') {
-    //   // Simulate network delay
-    //   await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    //   const aiMessage = {
-    //     id: uuidv4(),
-    //     role: 'assistant',
-    //     content: `This is a mock response to your message: "${content}"`,
-    //     timestamp: new Date()
-    //   };
-      
-    //   await db.chats.update(bookChat.id, {
-    //     messages: [...bookChat.messages, aiMessage]
-    //   } as Partial<Chat>);
-    // }
+  const getBookTextBeforePercentage = async () => {
+    const book = await db.books.where('id').equals(bookId).first();
+    return getPercentageOfString(book?.text ?? "", book?.percentCompleted ?? 0);
   };
 
   return {
     messages: chat?.messages ?? [],
     addMessage,
+    getBookName,
+    getBookTextBeforePercentage
   };
 }

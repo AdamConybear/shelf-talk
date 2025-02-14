@@ -26,3 +26,10 @@ export function formatBytes(
       : (sizes[i] ?? "Bytes")
   }`
 }
+
+export function getPercentageOfString(str: string, percentage: number) {
+  const stringLength = str.length;
+  const startIndex = 0;
+  const endIndex = Math.floor(stringLength * (percentage / 100));
+  return str.slice(startIndex, endIndex);
+}

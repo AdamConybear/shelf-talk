@@ -12,6 +12,7 @@ interface InputProps {
   input: string;
   isLoading: boolean;
   setInput: (value: string) => void,
+  setBookText: (value: string) => void,
   handleSubmit: (
     event?: {
       preventDefault?: () => void;
@@ -20,10 +21,10 @@ interface InputProps {
   ) => void;
 }
 
-export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading }: InputProps) {
+export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading, setBookText }: InputProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const { addMessage } = useBookChat(bookId);
+  const { getBookTextBeforePercentage } = useBookChat(bookId);
 
   const adjustHeight = (element: HTMLTextAreaElement) => {
     element.style.height = '0'
@@ -40,6 +41,8 @@ export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading }: 
 
   const submitForm = useCallback(async () => {
     if(input.trim()) {
+      let text = await getBookTextBeforePercentage();
+      setBookText(text ?? "");
       handleSubmit(undefined);
       setIsExpanded(false);
     }
@@ -58,7 +61,7 @@ export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading }: 
   }
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="p-4 flex justify-center w-full">
+      <form onSubmit={submitForm} className="p-4 flex justify-center w-full">
         <div className="relative flex justify-center w-full max-w-2xl px-4">
           <Textarea 
             ref={textareaRef}

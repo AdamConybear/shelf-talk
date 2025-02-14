@@ -4,7 +4,7 @@ import { useBookChat } from "@/hooks/use-book-chat"
 import { Button } from "@/components/ui/button"
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom"
 import { ArrowDownCircle } from "lucide-react"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { ChatInput } from "@/components/chat/chat-input"
 import { ChatMessages } from "@/components/chat/chat-messages"
 import { useChat } from '@ai-sdk/react'
@@ -18,11 +18,21 @@ interface ChatProps {
 export default function Chat({ bookId, initialMessages }: ChatProps) {
   const [containerRef, endRef, shouldAutoScroll, setShouldAutoScroll] = useScrollToBottom<HTMLDivElement>();
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const { addMessage } = useBookChat(bookId);
+  const { addMessage, getBookName } = useBookChat(bookId);
+  const [bookText, setBookText] = useState("");
+  const [bookName, setBookName] = useState("");
 
+  useEffect(() => {
+    const fetchBookName = async () => {
+      const name = await getBookName();
+      setBookName(String(name));
+    };
+    fetchBookName();
+  }, []);
+  
   const { messages, input, setInput, handleSubmit, isLoading } = useChat({ 
     initialMessages,
-    body: { bookId },
+    body: { bookText, bookName },
     maxSteps: 3,
     onFinish: async (message) => {
       // Add user message to local db
@@ -34,6 +44,8 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
       console.error('Chat error:', error);
     },
   });
+
+
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -80,6 +92,7 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
           setInput={setInput} 
           handleSubmit={handleSubmit} 
           isLoading={isLoading}
+          setBookText={setBookText}
         />
       </div>
     </div>
