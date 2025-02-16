@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { FileUploader } from "../file-uploader";
 
 export function NavMain() {
   const params = useParams();
@@ -32,13 +33,28 @@ export function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel className={cn(!open && "hidden")}>Your Shelf</SidebarGroupLabel>
-      <SidebarGroupAction title="Add Book">
-        <BookPlus /> <span className="sr-only">Add Book</span>
-      </SidebarGroupAction>
+      <Dialog>
+        <DialogTrigger asChild>
+          <SidebarGroupAction title="Add Book">
+            <BookPlus /> <span className="sr-only">Add Book</span>
+          </SidebarGroupAction>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add book to your shelf</DialogTitle>
+            <DialogDescription>
+              Upload an EPUB file to start chatting.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogClose asChild>
+            <FileUploader onSuccess={() => document.querySelector<HTMLButtonElement>('[data-state="open"]')?.click()} />
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
       <SidebarMenu className={cn(!open && "mt-2", "flex flex-col gap-2")}>
         {books.length === 0 ? (
           <SidebarMenuItem>
-            <span className="flex items-center justify-center px-4 py-1 text-xs text-muted-foreground">
+            <span className="flex items-center text-center justify-center w-full py-1 text-xs text-muted-foreground">
               why no books?
             </span>
           </SidebarMenuItem>
@@ -56,7 +72,7 @@ export function NavMain() {
                     ) : (
                       <Book />
                     )}
-                    <span>{book.name}</span>
+                    <span>{book.displayName}</span>
                   </div>
                 </SidebarMenuButton>
               </Link>
@@ -70,7 +86,7 @@ export function NavMain() {
                   <DialogHeader>
                     <DialogTitle>Delete Book</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to delete "{book.name}"? This action cannot be undone. 
+                      Are you sure you want to delete "{book.displayName}"? This action cannot be undone. 
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>

@@ -9,6 +9,7 @@ import { ChatInput } from "@/components/chat/chat-input"
 import { ChatMessages } from "@/components/chat/chat-messages"
 import { useChat } from '@ai-sdk/react'
 import { Message } from "ai";
+import { useBooks } from "@/hooks/use-books";
 
 interface ChatProps {
   bookId: string;
@@ -18,19 +19,32 @@ interface ChatProps {
 export default function Chat({ bookId, initialMessages }: ChatProps) {
   const [containerRef, endRef, shouldAutoScroll, setShouldAutoScroll] = useScrollToBottom<HTMLDivElement>();
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const { addMessage, getBookName } = useBookChat(bookId);
+  const { addMessage, percentCompleted } = useBookChat(bookId);
+  const { getBookName, getBookTextBeforePercentage } = useBooks();
   const [bookText, setBookText] = useState("");
   const [bookName, setBookName] = useState("");
 
   useEffect(() => {
+    if(percentCompleted && percentCompleted > 0) {
+    const fetchBookText = async () => {
+      const text = await getBookTextBeforePercentage(bookId);
+      console.log("getting book text")
+      setBookText(String(text));
+      };
+      fetchBookText();
+    }
+  }, [percentCompleted]);
+
+  useEffect(() => {
     const fetchBookName = async () => {
-      const name = await getBookName();
+      const name = await getBookName(bookId);
       setBookName(String(name));
     };
     fetchBookName();
   }, []);
   
   const { messages, input, setInput, handleSubmit, isLoading } = useChat({ 
+    id: bookId,
     initialMessages,
     body: { bookText, bookName },
     maxSteps: 3,
@@ -62,39 +76,48 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full w-full overflow-hidden">
-      {/* Messages container */}
-      <div 
-        className="flex-grow overflow-y-auto overflow-x-hidden relative w-full" 
-        ref={containerRef}
-        onScroll={handleScroll}
-      >
-        <div>
-          <ChatMessages messages={messages} />
-          <div ref={endRef} />
-          {showScrollButton && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={scrollToBottom}
-              className="sticky bottom-4 left-1/2 -translate-x-1/2 p-2 rounded-full"
-              aria-label="Scroll to bottom"
-            >
-              <ArrowDownCircle size={24} />
-            </Button>
-          )}
+      {percentCompleted === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-lg text-gray-500">
+            Update your progress to start chatting
+          </p>
         </div>
-      </div>
-      {/* Input container */}
-      <div className="flex-shrink-0">
-        <ChatInput 
-          bookId={bookId}
-          input={input} 
-          setInput={setInput} 
-          handleSubmit={handleSubmit} 
-          isLoading={isLoading}
-          setBookText={setBookText}
-        />
-      </div>
+      ) : (
+        <>
+          {/* Messages container */}
+          <div
+            className="flex-grow overflow-y-auto overflow-x-hidden relative w-full" 
+            ref={containerRef}
+            onScroll={handleScroll}
+          >
+            <div>
+              <ChatMessages messages={messages} isLoading={isLoading} />
+              <div ref={endRef} />
+              {showScrollButton && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={scrollToBottom}
+                  className="sticky bottom-4 left-1/2 -translate-x-1/2 p-2 rounded-full"
+                  aria-label="Scroll to bottom"
+                >
+                  <ArrowDownCircle size={24} />
+                </Button>
+              )}
+            </div>
+          </div>
+          {/* Input container */}
+          <div className="flex-shrink-0">
+            <ChatInput
+              bookId={bookId}
+              input={input}
+              setInput={setInput}
+              handleSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }

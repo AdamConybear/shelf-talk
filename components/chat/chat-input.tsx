@@ -5,14 +5,12 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { ChatRequestOptions } from "ai";
-import { useBookChat } from "@/hooks/use-book-chat";
 
 interface InputProps {
   bookId: string;
   input: string;
   isLoading: boolean;
   setInput: (value: string) => void,
-  setBookText: (value: string) => void,
   handleSubmit: (
     event?: {
       preventDefault?: () => void;
@@ -21,10 +19,9 @@ interface InputProps {
   ) => void;
 }
 
-export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading, setBookText }: InputProps) {
+export function ChatInput({ input, setInput, handleSubmit, isLoading }: InputProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const { getBookTextBeforePercentage } = useBookChat(bookId);
 
   const adjustHeight = (element: HTMLTextAreaElement) => {
     element.style.height = '0'
@@ -39,10 +36,9 @@ export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading, se
     }
   }, [input]) // This will run on mount and whenever message changes
 
-  const submitForm = useCallback(async () => {
+  const submitForm = useCallback(async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if(input.trim()) {
-      let text = await getBookTextBeforePercentage();
-      setBookText(text ?? "");
       handleSubmit(undefined);
       setIsExpanded(false);
     }
@@ -61,8 +57,8 @@ export function ChatInput({ bookId, input, setInput, handleSubmit, isLoading, se
   }
   return (
     <div className="w-full">
-      <form onSubmit={submitForm} className="p-4 flex justify-center w-full">
-        <div className="relative flex justify-center w-full max-w-2xl px-4">
+      <form onSubmit={submitForm} className="p-4 mb-2 flex justify-center w-full">
+        <div className="relative flex justify-center w-full max-w-3xl px-4">
           <Textarea 
             ref={textareaRef}
             value={input}

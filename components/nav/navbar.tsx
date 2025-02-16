@@ -10,6 +10,7 @@ import { DialogTrigger } from "../ui/dialog";
 import { Progress } from "../ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { useParams } from "next/navigation";
+import { Check } from "lucide-react";
 
 export function Navbar() {
   const params = useParams();
@@ -17,6 +18,7 @@ export function Navbar() {
   const [isEditing, setIsEditing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [editedBookName, setEditedBookName] = useState("");
   
   const currentBook = params.bookId && books ? books.find(book => book.id === String(params.bookId)) : null;
 
@@ -26,9 +28,15 @@ export function Navbar() {
     }
   }, [currentBook]);
 
+  useEffect(() => {
+    if (isEditing && currentBook) {
+      setEditedBookName(currentBook.displayName);
+    }
+  }, [isEditing, currentBook]);
+
   const handleNameSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && currentBook) {
-      updateDisplayName(currentBook.id, e.currentTarget.value );
+      updateDisplayName(currentBook.id, editedBookName);
       setIsEditing(false);
     }
     if (e.key === 'Escape') {
@@ -61,7 +69,7 @@ export function Navbar() {
   };
 
   return (
-    <div className="p-2 flex flex-row mt-1.5 items-center min-w-0">
+    <div className="p-2 flex flex-row mt-1.5 items-center min-w-0 bg-background">
       <div className="w-16 sm:w-32 flex-shrink-0">
         <SidebarTrigger />
       </div>
@@ -76,14 +84,34 @@ export function Navbar() {
           </Button>
         )}
         {currentBook && isEditing && (
-          <Input
-            className="w-auto min-w-[100px] max-w-[400px] h-7 text-sm text-center px-2"
-            defaultValue={currentBook.displayName}
-            autoFocus
-            onKeyDown={handleNameSubmit}
-            onBlur={() => setIsEditing(false)}
-            style={{ width: `${Math.min(currentBook.displayName.length + 2, 40)}ch` }}
-          />
+          <div className="flex items-center gap-2">
+            <Input
+              className="w-auto min-w-[100px] max-w-[400px] h-7 text-sm text-center px-2"
+              value={editedBookName}
+              onChange={(e) => setEditedBookName(e.target.value)}
+              autoFocus
+              onKeyDown={handleNameSubmit}
+              onBlur={(e) => {
+                // Don't trigger onBlur if clicking the save button
+                if (!e.relatedTarget?.closest('button')) {
+                  setIsEditing(false);
+                }
+              }}
+              style={{ width: `${Math.max(currentBook.displayName.length * 0.7, 10)}em` }}
+            />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                updateDisplayName(currentBook.id, editedBookName);
+                setIsEditing(false);
+              }}
+            >
+              <Check />
+            </Button>
+          </div>
         )}
       </div>
       <div className="w-16 sm:w-32 flex-shrink-0 flex justify-end">

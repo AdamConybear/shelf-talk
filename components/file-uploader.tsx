@@ -16,7 +16,11 @@ interface ExtendedSpine extends Spine {
   spineItems: Array<Section>; // Replace 'any' with a more specific type if known
 }
 
-export function FileUploader() {
+interface FileUploaderProps {
+  onSuccess?: () => void;
+}
+
+export function FileUploader({ onSuccess }: FileUploaderProps) {
   const { toast } = useToast()
   const { books, addBook, updateBookText } = useBooks()
   const router = useRouter()
@@ -90,6 +94,9 @@ export function FileUploader() {
           variant: "success",
         })
 
+        // Call the onSuccess callback after successful upload (used for dialog)
+        onSuccess?.()
+
         // Navigate to chat with the new book
         router.push(`/chat/${bookId}`)
       } catch (error) {
@@ -101,7 +108,7 @@ export function FileUploader() {
         })
       }
     },
-    [books, addBook, router, toast]
+    [books, addBook, router, toast, onSuccess]
   )
 
   return (

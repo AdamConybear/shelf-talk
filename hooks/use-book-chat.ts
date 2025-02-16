@@ -11,6 +11,14 @@ export function useBookChat(bookId: string) {
     () => db.chats.where('bookId').equals(bookId).first(),
     [bookId]
   );
+  
+  const percentCompleted = useLiveQuery(
+    async () => {
+      const book = await db.books.where('id').equals(bookId).first();
+      return book?.percentCompleted ?? 0;
+    },
+    [bookId]
+  );
 
   const addMessage = async (content: string, role: 'user' | 'assistant' = 'user') => {
     const newMessage = {
@@ -40,15 +48,10 @@ export function useBookChat(bookId: string) {
     return book?.name;
   };
 
-  const getBookTextBeforePercentage = async () => {
-    const book = await db.books.where('id').equals(bookId).first();
-    return getPercentageOfString(book?.text ?? "", book?.percentCompleted ?? 0);
-  };
-
   return {
     messages: chat?.messages ?? [],
+    percentCompleted,
     addMessage,
     getBookName,
-    getBookTextBeforePercentage
   };
 }
