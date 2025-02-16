@@ -10,6 +10,7 @@ import { ChatMessages } from "@/components/chat/chat-messages"
 import { useChat } from '@ai-sdk/react'
 import { Message } from "ai";
 import { useBooks } from "@/hooks/use-books";
+import { useToast } from "@/hooks/use-toast"
 
 interface ChatProps {
   bookId: string;
@@ -17,22 +18,23 @@ interface ChatProps {
 }
 
 export default function Chat({ bookId, initialMessages }: ChatProps) {
-  const [containerRef, endRef, shouldAutoScroll, setShouldAutoScroll] = useScrollToBottom<HTMLDivElement>();
+  const [containerRef, endRef] = useScrollToBottom<HTMLDivElement>();
   const [showScrollButton, setShowScrollButton] = useState(false);
   const { addMessage, percentCompleted } = useBookChat(bookId);
   const { getBookName, getBookTextBeforePercentage } = useBooks();
   const [bookText, setBookText] = useState("");
   const [bookName, setBookName] = useState("");
+  const { toast } = useToast()
 
   useEffect(() => {
-    if(percentCompleted && percentCompleted > 0) {
     const fetchBookText = async () => {
-      const text = await getBookTextBeforePercentage(bookId);
-      console.log("getting book text")
-      setBookText(String(text));
-      };
-      fetchBookText();
-    }
+      if (percentCompleted && percentCompleted > 0) {
+        const text = await getBookTextBeforePercentage(bookId);
+        setBookText(String(text));
+      }
+    };
+    fetchBookText();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentCompleted]);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
       setBookName(String(name));
     };
     fetchBookName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const { messages, input, setInput, handleSubmit, isLoading } = useChat({ 
@@ -56,21 +59,22 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
     },
     onError: (error) => {
       console.error('Chat error:', error);
+      toast({
+        title: "Error",
+        description: "An error occured getting response from server",
+        variant: "destructive",
+      });
     },
   });
-
-
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
     setShowScrollButton(!isNearBottom);
-    setShouldAutoScroll(isNearBottom);
-  }, [setShouldAutoScroll]);
+  }, []);
 
   const scrollToBottom = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-    setShouldAutoScroll(true);
     setShowScrollButton(false);
   };
 

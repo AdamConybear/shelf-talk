@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Upload } from "lucide-react"
-import Dropzone, { type FileRejection } from "react-dropzone"
+import Dropzone from "react-dropzone"
 import ePub from 'epubjs'
 import { useRouter } from "next/navigation"
 import { cn, formatBytes } from "@/lib/utils"
@@ -26,7 +26,7 @@ export function FileUploader({ onSuccess }: FileUploaderProps) {
   const router = useRouter()
 
   const onDrop = React.useCallback(
-    async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+    async (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return
 
       const newFile = acceptedFiles[0]
@@ -108,6 +108,7 @@ export function FileUploader({ onSuccess }: FileUploaderProps) {
         })
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [books, addBook, router, toast, onSuccess]
   )
 

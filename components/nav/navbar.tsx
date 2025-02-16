@@ -148,7 +148,7 @@ export function Navbar() {
               <Progress value={progress} />
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={handleFinished}>I'm Finished</Button>
+              <Button variant="ghost" onClick={handleFinished}>I&apos;m Finished</Button>
               <Button onClick={handleProgressUpdate}>Save Progress</Button>
             </DialogFooter>
           </DialogContent>

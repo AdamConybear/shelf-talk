@@ -86,7 +86,7 @@ export function NavMain() {
                   <DialogHeader>
                     <DialogTitle>Delete Book</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to delete "{book.displayName}"? This action cannot be undone. 
+                      Are you sure you want to delete &quot;{book.displayName}&quot;? This action cannot be undone. 
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>

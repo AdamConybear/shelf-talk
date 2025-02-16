@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { Message, streamText } from 'ai';
+import { streamText } from 'ai';
 import { google } from '@ai-sdk/google';
 
 const geminiFlashModel = google("gemini-2.0-flash-001")
