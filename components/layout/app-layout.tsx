@@ -9,9 +9,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="w-full overflow-hidden">
-        <Navbar />
-        <main className="flex flex-col h-[calc(100vh-64px)] w-full overflow-hidden">
+      <SidebarInset className="w-full" >
+        <main className="flex flex-col h-[100dvh] sm:h-screen w-full overflow-auto">
+          <Navbar />
           {children}
         </main>
       </SidebarInset>
