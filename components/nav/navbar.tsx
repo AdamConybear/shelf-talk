@@ -86,16 +86,17 @@ export function Navbar() {
         {currentBook && isEditing && (
           <div className="flex items-center gap-2">
             <Input
-              className="w-auto min-w-[100px] max-w-[400px] h-7 text-sm text-center px-2"
+              className="w-auto min-w-[100px] max-w-[200px] sm:max-w-[400px] h-7 text-sm text-center px-2"
               value={editedBookName}
               onChange={(e) => setEditedBookName(e.target.value)}
               autoFocus
               onKeyDown={handleNameSubmit}
               onBlur={(e) => {
-                // Don't trigger onBlur if clicking the save button
-                if (!e.relatedTarget?.closest('button')) {
-                  setIsEditing(false);
-                }
+                setTimeout(() => {
+                  if (!e.relatedTarget?.closest('button')) {
+                    setIsEditing(false);
+                  }
+                }, 200);
               }}
               style={{ width: `${Math.max(currentBook.displayName.length * 0.7, 10)}em` }}
             />

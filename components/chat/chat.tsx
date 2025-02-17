@@ -18,7 +18,7 @@ interface ChatProps {
 }
 
 export default function Chat({ bookId, initialMessages }: ChatProps) {
-  const [containerRef, endRef] = useScrollToBottom<HTMLDivElement>();
+  const [containerRef, endRef, , setShouldAutoScroll] = useScrollToBottom<HTMLDivElement>();
   const [showScrollButton, setShowScrollButton] = useState(false);
   const { addMessage, percentCompleted } = useBookChat(bookId);
   const { getBookName, getBookTextBeforePercentage } = useBooks();
@@ -71,10 +71,12 @@ export default function Chat({ bookId, initialMessages }: ChatProps) {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
     setShowScrollButton(!isNearBottom);
-  }, []);
+    setShouldAutoScroll(isNearBottom);
+  }, [setShouldAutoScroll]);
 
   const scrollToBottom = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
+    setShouldAutoScroll(true);
     setShowScrollButton(false);
   };
 

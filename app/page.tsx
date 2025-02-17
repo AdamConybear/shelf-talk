@@ -28,7 +28,7 @@ export default function Home() {
         </div>
 
         {/* Description */}
-        <div className="prose prose-neutral dark:prose-invert mx-auto text-center prose-sm sm:prose-base">
+        <div className="mx-auto text-center text-sm sm:text-base text-muted-foreground">
           <p>
             Upload your EPUB book and start a conversation. Shelf Talk tracks your 
             reading progress to ensure discussions remain spoiler-free, letting you 
